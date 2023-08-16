@@ -13,35 +13,34 @@
    let profiles : any = []
 
    onMount(() => {
+
+
+    if(data.currentUser){
+      session.login(data.currentUser)
+    }
+
+
     if(data.usersRes?.users){
       profiles = data.usersRes?.users
     }
    })
 
-   console.log("DATAA", data)
-	/*
-   $:{
-        
-
-       // @ts-ignore
-       session.login(newUser?.user)
-    }
-*/
 	
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>Home | {$session.user?.name}</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			
-			<h1 class="text-lg font-semibold leading-6 text-gray-900">{$session.user?.name} Welcome {$user?.name}  Sellect user to chat with!</h1>
-		</span>
-</h1>
+  <h1 class="text-4xl font-bold mb-6 text-center">
+    <span class="block text-indigo-500">Welcome, {$session.user?.name}!</span>
+    <span class="block text-gray-700 text-lg mt-2">
+      Get ready to connect and chat with other awesome users!
+    </span>
+  </h1>
+  
 
 <div class="h-screen shadow-lg overflow-y-auto scrollbar scrollbar-thumb-indigo-100 scrollbar-track-gray-100">
 	<ul role="list" class="divide-y divide-gray-100 bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-xl">
@@ -64,7 +63,7 @@
 			</div>
 			<div class="flex shrink-0 items-center gap-x-4">
 			  <div class="hidden sm:flex sm:flex-col sm:items-end">
-				<p class="text-sm leading-6 text-gray-900">{person.role}</p>
+				<p class="text-sm leading-6 text-gray-900">{"user"}</p>
 				{#if person.lastSeen}
 				  <p class="mt-1 text-xs leading-5 text-gray-500">Last seen <time datetime={person.lastSeenDateTime}>{person.lastSeen}</time></p>
 				{/if}

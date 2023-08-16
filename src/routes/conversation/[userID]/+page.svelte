@@ -42,6 +42,9 @@ let messages: any[] = []
 onMount(() => {
 
     //hadle the recieved props  
+    if(data.currentUser){
+      session.login(data.currentUser)
+    }
 
     if (data.conversations?.conversations) {
       messages = data.conversations.conversations.map((item) => ({
@@ -53,6 +56,7 @@ onMount(() => {
       }));
     }
   
+    
     // Replace 'YOUR_WEBSOCKET_URL' with the actual WebSocket server URL
     socket = new WebSocket('ws://localhost:3000/ws/12377?v=1.1');
 
@@ -62,16 +66,9 @@ onMount(() => {
 
     socket.onmessage = (event) => {
 
-      console.log('Received message:', event.data);
       if(extractMessage(event.data).receiver || extractMessage(event.data).sender == Number(data.currentUser?.id)){
-
-        console.log("Testing the func", extractMessage(event.data).sender)
-
         const extractedMesage = extractMessage(event.data)
-        //set message with the value
-       // messages = [...messages, message]
-        //notify user
-
+       
         const newMessage = {
       senderName: getUserInfoById(extractedMesage.sender)?.name  ,
       message: extractedMesage.message,
@@ -115,10 +112,34 @@ onMount(() => {
         sendMessage(messageString)
     }
 
-console.log("curent user", data.currentUser?.name)
 </script>
 
+<svelte:head>
+  <title>Chat with {getUserInfoById(Number(data.requestedUrl))?.name}</title>
+  <meta name="description" content="Svelte demo app" />
+</svelte:head>
+
 <section>
+  <button
+    class="bg-gray-400 rounded-md my-4 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded shadow flex items-center space-x-2"
+    on:click={() => window.history.back()}
+  >
+    <svg
+      class="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M10 19l-7-7m0 0l7-7m-7 7h18"
+      />
+    </svg>
+  </button>
+
   <div
     class="h-[65vh] shadow-lg overflow-y-auto scrollbar scrollbar-thumb-indigo-100 scrollbar-track-gray-100"
   >
@@ -134,21 +155,18 @@ console.log("curent user", data.currentUser?.name)
               <div class="py-0.5 text-xs leading-5 text-gray-500">
                 <span class="font-lg font-bold text-gray-900"
                   >{conversation.senderName}</span
-                > 
-               { formatRelativeTime(conversation.timesstap)}
+                >
+                {formatRelativeTime(conversation.timesstap)}
               </div>
-              
-              
-              {#if conversation.senderName == data.currentUser?.name}
-              <span class="text-green-500">
-                <Icon src="{CheckCircle}" class="w-5 h-5 mr-1" />
-              </span>
-                {/if}
 
+              {#if conversation.senderName == data.currentUser?.name}
+                <span class="text-green-500">
+                  <Icon src={CheckCircle} class="w-5 h-5 mr-1" />
+                </span>
+              {/if}
             </div>
             <p class="text-sm leading-6 text-gray-500">
               {conversation.message}
-             
             </p>
           </div>
         </li>
