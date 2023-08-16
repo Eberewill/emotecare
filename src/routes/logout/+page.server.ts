@@ -1,5 +1,4 @@
 import { redirect } from "@sveltejs/kit";
-import { session } from "../../stores/session.js";
 
 
 export function load({cookies}){

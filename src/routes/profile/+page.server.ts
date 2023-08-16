@@ -15,21 +15,24 @@ export const load = async (event) => {
     headers: {
       Authorization: `Bearer ${sessionId}`,
     },
-    credentials: 'include',
+    //credentials: 'include',
   }
   );
 
   // check the status
   if (res) {
-    const resUser = (await res.json()) as {
+    const user = (await res.json()) as {
       id: number;
       name: string;
       email: string;
+      session: string
     };
 
+    user.session = sessionId
     return {
       props: {
-        user : resUser,
+        user 
+
       },
     };
   }
