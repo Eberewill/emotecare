@@ -1,5 +1,4 @@
-
-const API_URL = "http://localhost:3000/api/auth/validate"
+import { BASE_URI } from '$lib/setup';
 
 export async function handle({ event, resolve }) {
     const authToken = event.cookies.get("sessionId");
@@ -11,7 +10,7 @@ export async function handle({ event, resolve }) {
 
         if(authToken){
 
-          const res = await event.fetch(`${API_URL}`, {
+          const res = await event.fetch(`${BASE_URI}/auth/validate`, {
             headers: {
               Authorization: `Bearer ${authToken}`,
             },

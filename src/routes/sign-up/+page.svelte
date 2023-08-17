@@ -1,8 +1,8 @@
 <script>
   import { goto } from '$app/navigation';
+  import { BASE_URI } from '$lib/setup';
 	import toast, { Toaster } from 'svelte-french-toast';
 
-const API_URL = "http://localhost:3000/api/auth/register"
 let email = '';
 let password = '';
 let name = '';
@@ -20,7 +20,7 @@ try {
         name
       });
 
-  const response = await fetch(API_URL, {
+  const response = await fetch(`${BASE_URI}/auth/register`, {
     body,
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -34,7 +34,7 @@ try {
       toast.success('Registered Successfully!')
       goto("/sign-in");
     }
-    toast.error(res.message)
+   // toast.error(res.message)
   } else {
     // Handle error response
     console.log("i cannot redirect")

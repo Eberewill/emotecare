@@ -7,6 +7,7 @@ import moment from 'moment';
   import { generateUniqueId, getTimestampWithOffset } from '$lib/utils';
   import type { serializedConversation } from '../../../types/Conversation';
   import FirstLetterImage from '../FirstLetterImage.svelte';
+  import toast, { Toaster } from 'svelte-french-toast';
 
 let socket: WebSocket;
 function extractMessage(jsonStr: string): any | null {
@@ -69,6 +70,12 @@ onMount(() => {
       if(extractMessage(event.data).receiver || extractMessage(event.data).sender == Number(data.currentUser?.id)){
         const extractedMesage = extractMessage(event.data)
        
+        const newMessageTotification = `new message from ${getUserInfoById(extractedMesage.sender)?.name }`
+        if(Number(data.requestedUrl) == Number(extractedMesage.sender) ){
+           toast.success(newMessageTotification)
+        }
+       
+        
         const newMessage = {
       senderName: getUserInfoById(extractedMesage.sender)?.name  ,
       message: extractedMesage.message,
@@ -139,7 +146,7 @@ onMount(() => {
       />
     </svg>
   </button>
-
+  <Toaster />
   <div
     class="h-[65vh] shadow-lg overflow-y-auto scrollbar scrollbar-thumb-indigo-100 scrollbar-track-gray-100"
   >

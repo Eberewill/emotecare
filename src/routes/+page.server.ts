@@ -1,7 +1,6 @@
 import { redirect } from "@sveltejs/kit";
-import { goto } from "$app/navigation";
 import type { UserResponse } from "../types/User.js";
-const API_URL = "http://localhost:3000/api/profile/users"
+import { BASE_URI } from "$lib/setup.js";
 
 
 export const load = async (event) => {
@@ -15,7 +14,7 @@ export const load = async (event) => {
   
 
     // if there is no sessionId, redirect to the sign-in page
-  const res = await event.fetch(`${API_URL}?page=1`, {
+  const res = await event.fetch(`${BASE_URI}/profile/users?page=1`, {
     headers: {
       Authorization: `Bearer ${sessionId}`,
     },

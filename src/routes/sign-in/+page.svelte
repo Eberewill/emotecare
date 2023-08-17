@@ -1,12 +1,11 @@
 <script>
 	import toast, { Toaster } from 'svelte-french-toast';
-  //import { session } from '../../stores/session';
   import { goto } from '$app/navigation';
   import axios from 'axios'
   import { user } from '../../stores';
+  import { BASE_URI } from '$lib/setup';
 
 
-const API_URL = "http://localhost:3000/api/auth/login"
 let email = '';
 let password = '';
 let isLoading = false;
@@ -33,7 +32,7 @@ async function handleSubmit(event) {
   event.preventDefault();
   isLoading = true;
   try {
-  const response = await axios.post(API_URL, {
+  const response = await axios.post(`${BASE_URI}/auth/login`, {
     email,
     password,
   });

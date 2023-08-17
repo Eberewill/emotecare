@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { goto } from "$app/navigation";
-const API_URL = "http://localhost:3000/api/auth/validate"
+import { BASE_URI } from "$lib/setup.js";
 
 
 export const load = async (event) => {
@@ -11,7 +11,7 @@ export const load = async (event) => {
   }
   
     // if there is no sessionId, redirect to the sign-in page
-  const res = await event.fetch(`${API_URL}`, {
+  const res = await event.fetch(`${BASE_URI}/auth/validate`, {
     headers: {
       Authorization: `Bearer ${sessionId}`,
     },

@@ -1,11 +1,8 @@
 
 import { redirect } from '@sveltejs/kit';
 import type { Conversation, conversationResponse } from '../../../types/Conversation.js';
+import { BASE_URI } from '$lib/setup.js';
 
-// Uncomment this if needed
-// import { API_URL } from "$env/static/private";
-
-const API_URL = "http://localhost:3000"
 
 export const load = async (event) => {
     const sessionId = event.cookies.get("sessionId");
@@ -23,7 +20,7 @@ export const load = async (event) => {
     if( event.locals.authUser.id == Number(requestedUrl)) throw redirect(302,'/')
     
 
-    const res = await fetch(`${API_URL}/api/conversations?partner_id=${requestedUrl}&page=1&page_size=20`, {
+    const res = await fetch(`${BASE_URI}/conversations?partner_id=${requestedUrl}&page=1&page_size=20`, {
         headers: {
             Authorization: `Bearer ${sessionId}`,
         },
