@@ -1,8 +1,5 @@
 <script lang="ts">
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcome_fallback from '$lib/images/svelte-welcome.png';
 	import {session} from '../stores/session'
-    import { user } from '../stores';
   import { onMount } from 'svelte';
   import FirstLetterImage from './conversation/FirstLetterImage.svelte';
 

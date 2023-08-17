@@ -1,30 +1,15 @@
 <script lang="ts">
-import { afterUpdate, onDestroy, onMount, tick } from 'svelte';
+import { onDestroy, onMount } from 'svelte';
 import {session} from '../../../stores/session'
 import { CheckCircle, Icon } from "svelte-hero-icons";
 import moment from 'moment';
-  import { user } from '../../../stores';
   import { generateUniqueId, getTimestampWithOffset } from '$lib/utils';
-  import type { serializedConversation } from '../../../types/Conversation';
   import FirstLetterImage from '../FirstLetterImage.svelte';
   import toast, { Toaster } from 'svelte-french-toast';
+  import { WS_ENDPOINT } from '$lib/setup';
 
 let socket: WebSocket;
-let ulElement: { scrollTop: any; scrollHeight: any; }; 
 
-// Function to scroll to the bottom of the list
-async function scrollToBottom() {
-    await tick();
-    if (ulElement) {
-      ulElement.scrollTop = ulElement.scrollHeight;
-    }
-  }
-
-  $: {
-    scrollToBottom();
-  }
-
-  afterUpdate(scrollToBottom);
 function extractMessage(jsonStr: string): any | null {
     try {
         const obj = JSON.parse(jsonStr);
@@ -74,7 +59,7 @@ onMount(() => {
   
     
     // Replace 'YOUR_WEBSOCKET_URL' with the actual WebSocket server URL
-    socket = new WebSocket('ws://localhost:3000/ws/12377?v=1.1');
+    socket = new WebSocket(WS_ENDPOINT);
 
     socket.onopen = (event) => {
      // console.log('WebSocket connection opened:', event);
@@ -91,7 +76,7 @@ onMount(() => {
         }
        
         
-        const newMessage = {
+      const newMessage = {
       senderName: getUserInfoById(extractedMesage.sender)?.name  ,
       message: extractedMesage.message,
       timestamp: extractedMesage.time,
@@ -165,7 +150,7 @@ onMount(() => {
   <div
     class="h-[65vh] shadow-lg overflow-y-auto scrollbar scrollbar-thumb-indigo-100 scrollbar-track-gray-100"
   >
-    <ul role="list" bind:this={ulElement} class="space-y-6 mx-4">
+    <ul role="list" class="space-y-6 mx-4">
       {#each messages as conversation (conversation.id)}
         <li class="relative flex gap-x-4">
           <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
@@ -178,7 +163,7 @@ onMount(() => {
                 <span class="font-lg font-bold text-gray-900"
                   >{conversation.senderName}</span
                 >
-                {formatRelativeTime(conversation.timesstap)}
+                {formatRelativeTime(conversation.timestamp)}
               </div>
 
               {#if conversation.senderName == data.currentUser?.name}

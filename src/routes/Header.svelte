@@ -25,14 +25,14 @@
       {/if}
       {#if $session.user?.name}
         <li>
-          <a href="/#" class="text-white hover:underline">
+          <div  class="text-white hover:underline">
             <button
 			  on:click={handleLogout}
               class="bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded shadow flex items-center space-x-2"
             >
               <span>Logout</span>
             </button>
-          </a>
+          </div>
         </li>
       {/if}
     </ul>

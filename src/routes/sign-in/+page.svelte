@@ -2,7 +2,6 @@
 	import toast, { Toaster } from 'svelte-french-toast';
   import { goto } from '$app/navigation';
   import axios from 'axios'
-  import { user } from '../../stores';
   import { BASE_URI } from '$lib/setup';
 
 
@@ -41,8 +40,7 @@ async function handleSubmit(event) {
 
     let bearerToken = response.data.token
     const token = bearerToken?.split("Bearer ")[1] || "";
-    setCookie("sessionId", token, 2);
-    user.set(response.data.user)  
+    setCookie("sessionId", token, 2); 
     toast.success(`Login ${response.data.message}`)
     goto("/");
   } else {

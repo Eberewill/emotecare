@@ -20,7 +20,7 @@ export const load = async (event) => {
     if( event.locals.authUser.id == Number(requestedUrl)) throw redirect(302,'/')
     
 
-    const res = await fetch(`${BASE_URI}/conversations?partner_id=${requestedUrl}&page=1&page_size=20`, {
+    const res = await fetch(`${BASE_URI}/conversations?partner_id=${requestedUrl}&page=1&page_size=30`, {
         headers: {
             Authorization: `Bearer ${sessionId}`,
         },
