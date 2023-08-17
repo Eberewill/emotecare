@@ -1,5 +1,5 @@
 <script lang="ts">
-import { onDestroy, onMount } from 'svelte';
+import { afterUpdate, onDestroy, onMount, tick } from 'svelte';
 import {session} from '../../../stores/session'
 import { CheckCircle, Icon } from "svelte-hero-icons";
 import moment from 'moment';
@@ -10,6 +10,21 @@ import moment from 'moment';
   import toast, { Toaster } from 'svelte-french-toast';
 
 let socket: WebSocket;
+let ulElement: { scrollTop: any; scrollHeight: any; }; 
+
+// Function to scroll to the bottom of the list
+async function scrollToBottom() {
+    await tick();
+    if (ulElement) {
+      ulElement.scrollTop = ulElement.scrollHeight;
+    }
+  }
+
+  $: {
+    scrollToBottom();
+  }
+
+  afterUpdate(scrollToBottom);
 function extractMessage(jsonStr: string): any | null {
     try {
         const obj = JSON.parse(jsonStr);
@@ -150,7 +165,7 @@ onMount(() => {
   <div
     class="h-[65vh] shadow-lg overflow-y-auto scrollbar scrollbar-thumb-indigo-100 scrollbar-track-gray-100"
   >
-    <ul role="list" class="space-y-6 mx-4">
+    <ul role="list" bind:this={ulElement} class="space-y-6 mx-4">
       {#each messages as conversation (conversation.id)}
         <li class="relative flex gap-x-4">
           <div class="absolute left-0 top-0 flex w-6 justify-center -bottom-6">
