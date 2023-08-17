@@ -4,13 +4,12 @@
 	import welcome from '$lib/images/svelte-welcome.webp';
 	import welcome_fallback from '$lib/images/svelte-welcome.png';
   //import { user } from '../../stores/index.js';
-    import {user} from '../../stores/index'
   import { session } from '../../stores/session';
 	export let data;
 	$:{
         const newUser = data.props;
         session.login(newUser?.user)
-		user.set(newUser?.user)
+		
     }
 
 </script>
