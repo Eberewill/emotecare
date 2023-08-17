@@ -6,3 +6,14 @@ export function getTokenAndUser(param: string): { token: string, user: { id: num
   
     return { token, user };
   }
+
+
+  export function extractMessage(jsonStr: string): any | null {
+    try {
+        const obj = JSON.parse(jsonStr);
+        return obj;
+    } catch (error) {
+        console.error("Error converting JSON to object:", error);
+        return null;
+    }
+}

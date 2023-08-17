@@ -2,28 +2,17 @@
 import { onDestroy, onMount } from 'svelte';
 import {session} from '../../../stores/session'
 import { CheckCircle, Icon } from "svelte-hero-icons";
-import moment from 'moment';
-  import { generateUniqueId, getTimestampWithOffset } from '$lib/utils';
+  import { formatRelativeTime, generateUniqueId, getTimestampWithOffset } from '$lib/utils';
   import FirstLetterImage from '../FirstLetterImage.svelte';
   import toast, { Toaster } from 'svelte-french-toast';
   import { WS_ENDPOINT } from '$lib/setup';
+  import { extractMessage } from '../../../utils';
 
 let socket: WebSocket;
 
-function extractMessage(jsonStr: string): any | null {
-    try {
-        const obj = JSON.parse(jsonStr);
-        return obj;
-    } catch (error) {
-        console.error("Error converting JSON to object:", error);
-        return null;
-    }
-}
 
 
-function formatRelativeTime(timestamp : string) {
-  return moment(timestamp).fromNow();
-}
+
 export let data;
 
 
@@ -58,7 +47,6 @@ onMount(() => {
     }
   
     
-    // Replace 'YOUR_WEBSOCKET_URL' with the actual WebSocket server URL
     socket = new WebSocket(WS_ENDPOINT);
 
     socket.onopen = (event) => {
@@ -115,7 +103,6 @@ onMount(() => {
         let messageBody = {message: message, sender: data.currentUser?.id, receiver : Number(data.requestedUrl) , time:   getTimestampWithOffset(), id : generateUniqueId() }
         let messageString = JSON.stringify(messageBody)
         
-        console.log("Message" , messageString)
         sendMessage(messageString)
     }
 
