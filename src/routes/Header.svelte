@@ -19,8 +19,9 @@
 
   //Notification
   let isModalOpen = false;
-  let notifications: any[] = [];
   let reconnectInterval: number;
+
+  let notifications: any[] = [];
 
   function openModal() {
     isModalOpen = true;
@@ -61,6 +62,8 @@
         ) {
           toast.success("New Notification");
           notifications = [...notifications, newNotification];
+          
+      console.log("Updated notifications:", notifications);
         }
       }
     };
