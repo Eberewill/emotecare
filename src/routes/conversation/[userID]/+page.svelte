@@ -106,6 +106,12 @@ onMount(() => {
         sendMessage(messageString)
     }
 
+    function formatLinks(text : string) {
+  var urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/ig;
+  return text.replace(urlPattern, "<a href='\$1' class='text-teal-600 font-bold mx-1' target='_blank'>\$1</a>");
+}
+
+
 </script>
 
 <svelte:head>
@@ -159,8 +165,8 @@ onMount(() => {
                 </span>
               {/if}
             </div>
-            <p class="text-sm leading-6 text-gray-500">
-              {conversation.message}
+            <p class="text-sm leading-6 text-gray-500 break-all">
+              {@html formatLinks(conversation.message)}
             </p>
           </div>
         </li>
@@ -226,3 +232,10 @@ onMount(() => {
     </form>
   </div>
 </section>
+
+<style>
+  .message-link {
+    @apply text-indigo-600 font-bold mx-1;
+  }
+</style>
+
