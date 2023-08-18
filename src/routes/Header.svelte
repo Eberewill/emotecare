@@ -6,13 +6,11 @@
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { extractMessage } from "../utils";
-  import { formatRelativeTime, playSound, truncateText } from "$lib/utils";
+  import { formatRelativeTime, truncateText } from "$lib/utils";
   import { WS_ENDPOINT } from "$lib/setup";
   import toast, { Toaster } from "svelte-french-toast";
 
   let socket: WebSocket;
-
-
 
   function handleLogout() {
     session.logout();
@@ -20,7 +18,6 @@
   }
 
   //Notification
-  let notifications: any[] = []
   let isModalOpen = false;
 
   function openModal() {
@@ -31,30 +28,36 @@
     isModalOpen = false;
   }
 
+  let notifications: any[] = [];
+
   onMount(() => {
-    //hadle the recieved props
+    // Handle the received props
     if ($session.user?.id) {
-
-     
+      console.log("USer is googed in", $session.user?.id);
       socket = new WebSocket(WS_ENDPOINT);
-
       socket.onmessage = (event) => {
-        
+        console.log("Msg is", event);
         if (extractMessage(event.data).receiver == Number($session.user?.id)) {
-          const extractedMesage = extractMessage(event.data);
-          //toast.success(`Message From ${extractedMesage.sender}`);
-          //store a global notificationstate
-          console.log("EXTRACTED MSG",extractedMesage )
-          const newMessages = {
-            // senderName: getUserInfoById(extractedMesage.sender)?.name,
-            senderId: extractedMesage.sender,
-            message: extractedMesage.message,
-            timestamp: extractedMesage.time,
-            id: extractedMesage.id,
+           //console.log("new Extracted Msg is mine");
+          const extractedMessage = extractMessage(event.data);
+          //  console.log("new Extracted Msg is", extractedMessage);
+          const newNotification = {
+            senderId: extractedMessage.sender,
+            message: extractedMessage.message,
+            timestamp: extractedMessage.time,
+            id: extractedMessage.id,
           };
-          notifications = [...notifications, newMessages];
-
-        //  playSound();
+          // console.log("new Notification is", newNotification);
+          const path = window.location.pathname;
+          const parts = path.split("/");
+          //check if user is already chating with the sender if not send them notificaion
+          if (
+            parts[1] !== "conversation" &&
+            parts[2] !== newNotification.senderId.toString()
+          ) {
+            toast.success("New Notification");
+            notifications = [...notifications, newNotification];
+          }
         }
       };
     }
@@ -97,7 +100,7 @@
                 d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
               />
             </svg>
-            {#if notifications.length > 1}
+            {#if notifications.length >= 1}
               <span
                 class="absolute top-0 right-0 -mt-1 -mr-1 bg-red-500 text-white rounded-full h-4 w-4 flex items-center justify-center text-xs"
               >
@@ -152,7 +155,9 @@
                               <div class="flex items-start">
                                 <div class="ml-3 w-0 flex-1">
                                   <p class="text-sm font-medium text-gray-900">
-                                    Message from {notification.senderId}
+                                    Message from User-{notification.senderId}-{Math.random(
+                                      1000
+                                    )}
                                   </p>
                                   <p class="mt-1 text-sm text-gray-500">
                                     {truncateText(notification.message, 5)} - {formatRelativeTime(
@@ -164,10 +169,12 @@
                             </div>
                             <div class="flex border-l border-gray-200">
                               <button
-                                on:click={() =>
+                                on:click={() => {
+                                  closeModal();
                                   goto(
                                     `/conversation/${notification.senderId}`
-                                  )}
+                                  );
+                                }}
                                 type="button"
                                 class="flex items-center justify-center rounded-none rounded-r-lg border border-transparent p-4 text-sm font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 >Reply</button
