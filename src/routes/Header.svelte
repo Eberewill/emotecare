@@ -4,7 +4,7 @@
   import FirstLetterImage from "./conversation/FirstLetterImage.svelte";
   import { session } from "../stores/session";
   import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import { extractMessage } from "../utils";
   import { formatRelativeTime, truncateText } from "$lib/utils";
   import { WS_ENDPOINT } from "$lib/setup";
@@ -19,6 +19,8 @@
 
   //Notification
   let isModalOpen = false;
+  let notifications: any[] = [];
+  let reconnectInterval: number;
 
   function openModal() {
     isModalOpen = true;
@@ -28,38 +30,66 @@
     isModalOpen = false;
   }
 
-  let notifications: any[] = [];
+  //mechanism
+
+  function connectWebSocket() {
+    socket = new WebSocket(WS_ENDPOINT);
+
+    socket.onopen = () => {
+      console.log("WebSocket connection established");
+      clearInterval(reconnectInterval);
+    };
+
+    socket.onmessage = (event) => {
+      if (extractMessage(event.data).receiver == Number($session.user?.id)) {
+        //console.log("new Extracted Msg is mine");
+        const extractedMessage = extractMessage(event.data);
+        //  console.log("new Extracted Msg is", extractedMessage);
+        const newNotification = {
+          senderId: extractedMessage.sender,
+          message: extractedMessage.message,
+          timestamp: extractedMessage.time,
+          id: extractedMessage.id,
+        };
+        // console.log("new Notification is", newNotification);
+        const path = window.location.pathname;
+        const parts = path.split("/");
+        //check if user is already chating with the sender if not send them notificaion
+        if (
+          parts[1] !== "conversation" &&
+          parts[2] !== newNotification.senderId.toString()
+        ) {
+          toast.success("New Notification");
+          notifications = [...notifications, newNotification];
+        }
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("WebSocket connection closed");
+      reconnectWebSocket();
+    };
+  }
+  function reconnectWebSocket() {
+    clearInterval(reconnectInterval);
+    reconnectInterval = setInterval(() => {
+      console.log("Reconnecting WebSocket...");
+      connectWebSocket();
+    }, 5000); //5se
+  }
 
   onMount(() => {
-    // Handle the received props
     if ($session.user?.id) {
-      console.log("USer is googed in", $session.user?.id);
-      socket = new WebSocket(WS_ENDPOINT);
-      socket.onmessage = (event) => {
-        console.log("Msg is", event);
-        if (extractMessage(event.data).receiver == Number($session.user?.id)) {
-           //console.log("new Extracted Msg is mine");
-          const extractedMessage = extractMessage(event.data);
-          //  console.log("new Extracted Msg is", extractedMessage);
-          const newNotification = {
-            senderId: extractedMessage.sender,
-            message: extractedMessage.message,
-            timestamp: extractedMessage.time,
-            id: extractedMessage.id,
-          };
-          // console.log("new Notification is", newNotification);
-          const path = window.location.pathname;
-          const parts = path.split("/");
-          //check if user is already chating with the sender if not send them notificaion
-          if (
-            parts[1] !== "conversation" &&
-            parts[2] !== newNotification.senderId.toString()
-          ) {
-            toast.success("New Notification");
-            notifications = [...notifications, newNotification];
-          }
-        }
-      };
+      console.log("LETS Notification this connection ")
+      connectWebSocket();
+    }
+  });
+
+  // Cleanup the WebSocket connection on component unmount
+  onDestroy(() => {
+    clearInterval(reconnectInterval);
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      socket.close();
     }
   });
 </script>
